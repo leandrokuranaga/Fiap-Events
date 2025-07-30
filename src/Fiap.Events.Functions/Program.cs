@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace Fiap.Events.Functions
+﻿namespace Fiap.Events.Functions
 {
     public static partial class Program
     {
