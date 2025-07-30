@@ -1,0 +1,13 @@
+﻿global using brevo_csharp.Api;
+global using brevo_csharp.Model;
+global using Fiap.Events.Infra.Common.Configuration;
+global using Microsoft.Extensions.Options;
+global using System.Diagnostics;
+global using Newtonsoft.Json;
+global using System.Collections.Specialized;
+global using System.Diagnostics.CodeAnalysis;
+global using System.Text;
+global using Dapper;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using System.Data;

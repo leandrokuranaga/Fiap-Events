@@ -1,0 +1,16 @@
+﻿global using Amazon.Lambda.Core;
+global using Fiap.Events.Services.Events.Models;
+global using Fiap.Events.Services.Events.Service;
+global using Microsoft.Extensions.Logging;
+global using Newtonsoft.Json;
+
+
+global using Amazon.Lambda.SQSEvents;
+global using Microsoft.Extensions.DependencyInjection;
+global using System.Text;
+global using Fiap.Events.Services.Common;
+
+global using Fiap.Events.Infra.Common.Configuration;
+global using Fiap.Events.Infra.Http.Email;
+global using Microsoft.Extensions.Configuration;
+global using System.Diagnostics.CodeAnalysis;
