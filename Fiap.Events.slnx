@@ -6,6 +6,7 @@
     <Project Path="src/Fiap.Events.Services/Fiap.Events.Services/Fiap.Events.Services.csproj" />
   </Folder>
   <Folder Name="/3. Infra Layer/">
+    <Project Path="src/Fiap.Contracts.Events/Fiap.Contracts.Events.csproj" Id="c279596f-5abe-4728-99a7-f7b8eb2ec97d" />
     <Project Path="src/Fiap.Events.Infra/Fiap.Events.Infra.csproj" />
   </Folder>
   <Folder Name="/4. Tests Layer/">

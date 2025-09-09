@@ -1,3 +1,6 @@
+using Fiap.Contracts.Events;
+using Newtonsoft.Json.Linq;
+
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace Fiap.Events.Functions;
@@ -20,20 +23,19 @@ public class Function
     }
 
     /// <summary>
-    /// A function that processes SQS messages from fcg-queue and sends email to user
+    /// Lambda function triggered by SQS messages.  
+    /// It normalizes the incoming payload, deserializes the event, maps it into a CreateAccount object
+    /// and calls the event service to send an email notification.
     /// </summary>
-    /// <param name="sqsEvent">The SQS event for the Lambda function handler to process.</param>
-    /// <param name="context">The ILambdaContext that provides methods for logging and describing the Lambda environment.</param>
-    /// <returns></returns>
     public async Task CreateUserFunction(SQSEvent sqsEvent, ILambdaContext context)
     {
-        if (sqsEvent?.Records == null)
+        if (sqsEvent?.Records == null || sqsEvent.Records.Count == 0)
         {
-            _log.LogError("SQS event or records is null");
+            _log.LogError("SQS event or records is null/empty.");
             return;
         }
 
-        _log.LogInformation($"Processing {sqsEvent.Records.Count} messages from SQS queue");
+        _log.LogInformation("Processing {Count} messages from SQS queue.", sqsEvent.Records.Count);
 
         foreach (var record in sqsEvent.Records)
         {
@@ -41,73 +43,127 @@ public class Function
         }
     }
 
-    private async System.Threading.Tasks.Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
+    private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
     {
         try
         {
-            _log.LogInformation($"Processing SQS message with ID: {message.MessageId}");
-            _log.LogInformation($"Raw message body: {message.Body}");
+            _log.LogInformation("Processing SQS message {MessageId}", message.MessageId);
+            _log.LogDebug("Raw message body: {Body}", message.Body);
 
-            string finalJsonPayload;
+            var finalJson = ExtractEventJson(message.Body);
 
-            try
+            _log.LogDebug("Normalized JSON payload: {Payload}", finalJson);
+
+            var evt = JsonConvert.DeserializeObject<CreateUserIntegrationEvent>(finalJson);
+            if (evt is null)
             {
-                var messageWrapper = JsonConvert.DeserializeObject<MessageWrapper>(message.Body);
-                
-                if (messageWrapper?.Body != null)
-                {
-                    _log.LogInformation("Message has wrapper format with body property");
-                    
-                    var base64Bytes = Convert.FromBase64String(messageWrapper.Body);
-                    var decodedString = Encoding.UTF8.GetString(base64Bytes);
-                    _log.LogInformation($"Decoded Base64: {decodedString}");
-
-                    if (decodedString.StartsWith("\"") && decodedString.EndsWith("\""))
-                    {
-                        finalJsonPayload = JsonConvert.DeserializeObject<string>(decodedString);
-                        _log.LogInformation($"Unescaped JSON string: {finalJsonPayload}");
-                    }
-                    else
-                    {
-                        finalJsonPayload = decodedString;
-                    }
-                }
-                else
-                {
-                    var base64Bytes = Convert.FromBase64String(message.Body);
-                    finalJsonPayload = Encoding.UTF8.GetString(base64Bytes);
-                }
-            }
-            catch (Exception ex)
-            {
-                _log.LogWarning($"Failed to decode message: {ex.Message}");
-                finalJsonPayload = message.Body;
+                _log.LogError("Failed to deserialize payload into CreateUserIntegrationEvent.");
+                return;
             }
 
-            _log.LogInformation($"Final JSON to deserialize: {finalJsonPayload}");
-            var messageDeserialized = JsonConvert.DeserializeObject<CreateAccount>(finalJsonPayload);
-            
-            _log.LogInformation($"Message deserialized successfully - Name: {messageDeserialized?.Name}, Email: {messageDeserialized?.Email?.Address}");
+            var account = new CreateAccount
+            {
+                Id = evt.UserId,
+                Name = evt.Name,
+                Email = new Email { Address = evt.Email },
+                TypeUser = evt.Type,
+                Active = evt.Active
+            };
 
-            if (messageDeserialized != null)
-            {
-                await _eventService.SendCreateUserEmail(messageDeserialized);
-                _log.LogInformation($"User email sent successfully to: {messageDeserialized.Email.Address}");
-            }
-            else
-            {
-                _log.LogError("Failed to deserialize message to CreateAccount");
-            }
+            _log.LogInformation("Mapped event to CreateAccount: Name={Name}, Email={Email}",
+                                account.Name, account.Email?.Address);
+
+            await _eventService.SendCreateUserEmail(account);
+
+            _log.LogInformation("User email sent successfully to: {Email}", account.Email?.Address);
+        }
+        catch (JsonException jsonEx)
+        {
+            _log.LogError(jsonEx,
+                "JSON deserialization error while processing message {MessageId}. Payload: {Body}",
+                message.MessageId, message.Body);
+            throw;
+        }
+        catch (FormatException formatEx)
+        {
+            _log.LogError(formatEx,
+                "Base64 decoding error while processing message {MessageId}. Payload: {Body}",
+                message.MessageId, message.Body);
+            throw;
         }
         catch (Exception ex)
         {
-            _log.LogError($"An error occurred while processing the user email: {ex.Message}");
-            _log.LogError($"Stack trace: {ex.StackTrace}");
+            _log.LogError(ex, "Unexpected error while processing message {MessageId}", message.MessageId);
             throw;
         }
         finally
         {
-            _log.LogInformation($"SQS message {message.MessageId} processing completed.");
+            _log.LogInformation("Finished processing SQS message {MessageId}.", message.MessageId);
+        }
+    }
+
+    /// <summary>
+    /// Extracts the inner JSON event from the raw SQS message body.  
+    /// Supports three formats:
+    ///  1) Rebus envelope: { "headers": {...}, "body": "base64(...json...)" }
+    ///  2) Base64 encoded JSON directly in the body
+    ///  3) Plain JSON already in the body
+    /// </summary>
+    private static string ExtractEventJson(string rawBody)
+    {
+        try
+        {
+            var token = JToken.Parse(rawBody);
+
+            if (token.Type == JTokenType.Object && token["body"] is JToken bodyToken)
+            {
+                var bodyString = bodyToken.Type == JTokenType.String
+                    ? bodyToken.Value<string>()!
+                    : bodyToken.ToString(Newtonsoft.Json.Formatting.None);
+
+                if (TryBase64Decode(bodyString, out var decoded))
+                {
+                    if (decoded.StartsWith("\"") && decoded.EndsWith("\""))
+                        return JsonConvert.DeserializeObject<string>(decoded)!;
+
+                    return decoded;
+                }
+
+                return bodyString;
+            }
+        }
+        catch (JsonReaderException jre)
+        {
+            Console.WriteLine($"ExtractEventJson: raw body is not an object JSON. Error={jre.Message}");            
+        }
+
+        if (TryBase64Decode(rawBody, out var decodedBody))
+        {
+            if (decodedBody.StartsWith("\"") && decodedBody.EndsWith("\""))
+                return JsonConvert.DeserializeObject<string>(decodedBody)!;
+
+            return decodedBody;
+        }
+
+        return rawBody;
+    }
+
+    /// <summary>
+    /// Attempts to decode a base64 string into UTF-8 text.  
+    /// Returns true if decoding succeeded, false otherwise.
+    /// </summary>
+    private static bool TryBase64Decode(string input, out string decoded)
+    {
+        try
+        {
+            var bytes = Convert.FromBase64String(input);
+            decoded = Encoding.UTF8.GetString(bytes);
+            return true;
+        }
+        catch (FormatException)
+        {
+            decoded = string.Empty;
+            return false;
         }
     }
 }
