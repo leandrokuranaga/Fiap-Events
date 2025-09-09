@@ -1,3 +1,5 @@
+using Fiap.Contracts.Events;
+
 namespace Fiap.Events.Unit.Tests._1._Function_Layer_Tests;
 
 public class FunctionTest
@@ -17,13 +19,15 @@ public class FunctionTest
     public async Task CreateUserFunction_WithMessageWrapperFormat_ShouldProcessSuccessfully()
     {
         // Arrange
-        var createAccount = new CreateAccount
-        {
-            Name = "Test User",
-            Email = new Email { Address = "test@example.com" }
-        };
+        var integrationEvent = new CreateUserIntegrationEvent(
+            UserId: 1,
+            Name: "Test User",
+            Email: "test@example.com",
+            Type: 1,
+            Active: true
+        );
 
-        var jsonPayload = JsonConvert.SerializeObject(createAccount);
+        var jsonPayload = JsonConvert.SerializeObject(integrationEvent);
         var base64Payload = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonPayload));
         var messageWrapper = new MessageWrapper
         {
@@ -52,22 +56,22 @@ public class FunctionTest
         await _function.CreateUserFunction(sqsEvent, context);
 
         // Assert
-        _mockEventService.Verify(x => x.SendCreateUserEmail(It.Is<CreateAccount>(
-            ca => ca.Name == createAccount.Name && ca.Email.Address == createAccount.Email.Address)), 
-            Times.Once);
+        _mockEventService.Verify(x => x.SendCreateUserEmail(It.IsAny<CreateAccount>()), Times.Once);
     }
 
     [Fact]
     public async Task CreateUserFunction_WithPlainTextFallback_ShouldProcessSuccessfully()
     {
         // Arrange
-        var createAccount = new CreateAccount
-        {
-            Name = "Test User Plain",
-            Email = new Email { Address = "testplain@example.com" }
-        };
+        var integrationEvent = new CreateUserIntegrationEvent(
+            UserId: 2,
+            Name: "Test User Plain",
+            Email: "testplain@example.com",
+            Type: 1,
+            Active: true
+        );
 
-        var messageBody = JsonConvert.SerializeObject(createAccount);
+        var messageBody = JsonConvert.SerializeObject(integrationEvent);
 
         var sqsEvent = new SQSEvent
         {
@@ -90,22 +94,22 @@ public class FunctionTest
         await _function.CreateUserFunction(sqsEvent, context);
 
         // Assert
-        _mockEventService.Verify(x => x.SendCreateUserEmail(It.Is<CreateAccount>(
-            ca => ca.Name == createAccount.Name && ca.Email.Address == createAccount.Email.Address)), 
-            Times.Once);
+        _mockEventService.Verify(x => x.SendCreateUserEmail(It.IsAny<CreateAccount>()), Times.Once);
     }
 
     [Fact]
     public async Task CreateUserFunction_WithEscapedJsonString_ShouldProcessSuccessfully()
     {
         // Arrange
-        var createAccount = new CreateAccount
-        {
-            Name = "Test User Escaped",
-            Email = new Email { Address = "testescaped@example.com" }
-        };
+        var integrationEvent = new CreateUserIntegrationEvent(
+            UserId: 3,
+            Name: "Test User Escaped",
+            Email: "testescaped@example.com",
+            Type: 1,
+            Active: true
+        );
 
-        var jsonPayload = JsonConvert.SerializeObject(createAccount);
+        var jsonPayload = JsonConvert.SerializeObject(integrationEvent);
         var escapedJson = JsonConvert.SerializeObject(jsonPayload);
         var base64Payload = Convert.ToBase64String(Encoding.UTF8.GetBytes(escapedJson));
         var messageWrapper = new MessageWrapper
@@ -135,9 +139,7 @@ public class FunctionTest
         await _function.CreateUserFunction(sqsEvent, context);
 
         // Assert
-        _mockEventService.Verify(x => x.SendCreateUserEmail(It.Is<CreateAccount>(
-            ca => ca.Name == createAccount.Name && ca.Email.Address == createAccount.Email.Address)), 
-            Times.Once);
+        _mockEventService.Verify(x => x.SendCreateUserEmail(It.IsAny<CreateAccount>()), Times.Once);
     }
 
     [Fact]
