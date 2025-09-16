@@ -14,9 +14,16 @@ namespace Fiap.Events.Functions
 
             try
             {
+
+                Log.Logger = new LoggerConfiguration()
+                   .WriteTo.Console(new JsonFormatter())
+                   .Enrich.WithProperty("Application", "EVENTS-FUNCTION")
+                   .Enrich.WithProperty("Environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production")
+                   .CreateLogger();
+
                 var tempServices = new ServiceCollection();
                 tempServices.AddLogging(cfg => {
-                    cfg.AddConsole();
+                    cfg.AddSerilog();
                     cfg.SetMinimumLevel(LogLevel.Information);
                 });
                 var tempProvider = tempServices.BuildServiceProvider();
@@ -83,8 +90,20 @@ namespace Fiap.Events.Functions
                 services.AddSingleton<IConfiguration>(configuration);
                 services.AddDefaultAWSOptions(awsOptions);
 
+                services.AddOpenTelemetry()
+                    .WithTracing(tracing => tracing
+                        .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                            .AddService("EVENTS-FUNCTION"))
+                        .AddAWSLambdaConfigurations() 
+                        .AddJaegerExporter(options =>
+                        {
+                            options.AgentHost = "localhost"; 
+                            options.AgentPort = 6831;
+                        }));
+
+
                 services.AddLogging(cfg => {
-                    cfg.AddConsole();
+                    cfg.AddSerilog();
                     cfg.SetMinimumLevel(LogLevel.Information);
                 });
 
@@ -104,8 +123,14 @@ namespace Fiap.Events.Functions
                     logger.LogCritical(ex, "FATAL ERROR in Program static constructor: {ErrorMessage}", ex.Message);
                 else
                 {
-                    Console.WriteLine($"FATAL ERROR in Program static constructor: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    Console.WriteLine(JsonConvert.SerializeObject(new
+                    {
+                        Timestamp = DateTime.UtcNow,
+                        Level = "Critical",
+                        Message = $"FATAL ERROR in Program static constructor: {ex.Message}",
+                        Exception = ex.ToString(),
+                        Application = "EVENTS-FUNCTION"
+                    }));
                 }
                 throw;
             }
