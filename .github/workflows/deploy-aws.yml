@@ -1,11 +1,14 @@
 name: Deploy to AWS Lambda
 
 on:
-  workflow_run:
-    workflows: ["Release on Main (.NET 8)"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["Release on Main (.NET 8)"]
+  #   types:
+  #     - completed
 
+  push:
+    branches:
+    - dev
 jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
