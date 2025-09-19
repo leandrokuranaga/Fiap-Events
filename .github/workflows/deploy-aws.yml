@@ -39,7 +39,7 @@ jobs:
           dotnet lambda deploy-function \
             --function-name "Fiap-Event" \
             --framework "net8.0" \
-            --runtime "dotnet8" \
+            --function-runtime "dotnet8" \
             --architecture "x86_64" \
             --memory-size 512 \
             --timeout 30 \
