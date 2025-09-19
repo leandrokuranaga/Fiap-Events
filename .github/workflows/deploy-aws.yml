@@ -13,6 +13,11 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Configurar credenciais da AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -20,22 +25,70 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
       - name: Instalar Amazon Lambda Tools
         run: dotnet tool install -g Amazon.Lambda.Tools
 
-      - name: Restaurar dependências
-        run: dotnet restore
+      # 🔄 Converter .slnx → .sln (temporário)
+      - name: Criar .sln temporário a partir do .slnx
+        shell: bash
+        run: |
+          set -euo pipefail
 
-      - name: Build da aplicação
-        run: dotnet build --configuration Release --no-restore
+          # Instala jq se necessário
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+          fi
 
+          SLNX_FILE="$(git ls-files '*.slnx' | head -n 1)"
+          if [ -z "${SLNX_FILE}" ]; then
+            echo "Nenhum .slnx encontrado na raiz do repo."
+            exit 1
+          fi
+          echo "Usando SLNX: ${SLNX_FILE}"
+
+          SLN_NAME="$(basename "${SLNX_FILE%.*}")"
+          SLN_FILE="${SLN_NAME}.sln"
+
+          dotnet new sln -n "${SLN_NAME}"
+
+          mapfile -t PROJECTS < <(jq -r '
+              (.solution.projects[]?.path? // empty),
+              (.projects[]?.path? // empty),
+              (.. | objects | select(has("path")) | .path? // empty)
+            ' "${SLNX_FILE}" \
+            | grep -E '\.csproj$' \
+            | sort -u)
+
+          if [ ${#PROJECTS[@]} -eq 0 ]; then
+            echo "Nenhum .csproj referenciado no ${SLNX_FILE}."
+            exit 1
+          fi
+
+          echo "Projetos detectados:"
+          printf ' - %s\n' "${PROJECTS[@]}"
+
+          for proj in "${PROJECTS[@]}"; do
+            if [ -f "$proj" ]; then
+              dotnet sln "${SLN_FILE}" add "$proj"
+            else
+              echo "Aviso: não encontrado: $proj"
+            fi
+          done
+
+          echo "Solução gerada: ${SLN_FILE}"
+          ls -la "${SLN_FILE}"
+
+      - name: Restaurar dependências (via .sln temporário)
+        run: dotnet restore *.sln
+
+      - name: Build da solução
+        run: dotnet build *.sln --configuration Release --no-restore
+
+      # 🚀 Deploy: rodar dentro do diretório do projeto Lambda
       - name: Deploy para AWS Lambda
         run: dotnet lambda deploy-function
         working-directory: ./src/Fiap.Events.Services/Fiap.Events.Services
         env:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+          DOTNET_CLI_TELEMETRY_OPTOUT: 1
