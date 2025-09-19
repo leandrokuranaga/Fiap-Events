@@ -42,7 +42,7 @@ jobs:
             --function-runtime "dotnet8" \
             --architecture "x86_64" \
             --function-memory-size 512 \
-            --timeout 30 \
+            --function-timeout 30 \
             --role "arn:aws:iam::433980487130:role/AWSLambdaSQSQueueExecutionFunction" \
             --disable-interactive true
         working-directory: ./src/Fiap.Events.Services/Fiap.Events.Services
