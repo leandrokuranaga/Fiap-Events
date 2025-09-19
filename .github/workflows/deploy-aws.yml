@@ -44,6 +44,7 @@ jobs:
             --function-memory-size 512 \
             --function-timeout 30 \
             --role "arn:aws:iam::433980487130:role/AWSLambdaSQSQueueExecutionFunction" \
+            --function-handler "Fiap.Events.Functions::Fiap.Events.Functions.Function::CreateUserFunction" \
             --disable-interactive true
         working-directory: ./src/Fiap.Events.Services/Fiap.Events.Services
         env:
