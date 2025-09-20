@@ -23,11 +23,6 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Create temporary .sln from .slnx
-        run: |
-          dotnet new sln -n Fiap
-          find . -name "*.csproj" -exec dotnet sln Fiap.sln add {} \;
-
       - name: Restore dependencies
         run: dotnet restore *.sln
 
