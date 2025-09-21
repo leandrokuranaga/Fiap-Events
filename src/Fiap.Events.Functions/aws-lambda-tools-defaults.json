@@ -12,6 +12,6 @@
   "function-runtime": "dotnet8",
   "function-memory-size": 512,
   "function-timeout": 30,
-  "function-name": "Fiap-Events",
+  "function-name": "Fiap-Event",
   "function-handler": "Fiap.Events.Functions::Fiap.Events.Functions.Function::CreateUserFunction"
 }

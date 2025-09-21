@@ -36,16 +36,18 @@ jobs:
 
       - name: Deploy para AWS Lambda
         run: |
-          dotnet lambda deploy-function \
-            --function-name "Fiap-Events" \
-            --framework "net8.0" \
-            --function-runtime "dotnet8" \
-            --architecture "x86_64" \
+          dotnet lambda deploy-function Fiap-Event \
+            --function-name Fiap-Event \
+            --framework net8.0 \
+            --function-runtime dotnet8 \
+            --architecture x86_64 \
             --function-memory-size 512 \
             --function-timeout 30 \
-            --function-role "arn:aws:iam::433980487130:role/AWSLambdaSQSQueueExecutionFunction" \
-            --function-handler "Fiap.Events.Functions::Fiap.Events.Functions.Function::CreateUserFunction" \
+            --function-role arn:aws:iam::433980487130:role/AWSLambdaSQSQueueExecutionFunction \
+            --function-handler Fiap.Events.Functions::Fiap.Events.Functions.Function::CreateUserFunction \
+            --region ${{ secrets.AWS_REGION }} \
             --disable-interactive true
         working-directory: ./src/Fiap.Events.Services/Fiap.Events.Services
         env:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      
