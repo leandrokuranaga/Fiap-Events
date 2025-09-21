@@ -1,6 +1,7 @@
 ﻿using Amazon;
 using Amazon.Extensions.NETCore.Setup;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using MSLogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Fiap.Events.Functions
 {
@@ -10,7 +11,7 @@ namespace Fiap.Events.Functions
 
         static Program()
         {
-            ILogger logger = null;
+            MSLogger logger = null;
 
             try
             {
@@ -23,11 +24,11 @@ namespace Fiap.Events.Functions
                 var loggerFactory = tempProvider.GetRequiredService<ILoggerFactory>();
                 logger = loggerFactory.CreateLogger("Program");
 
-                logger.LogInformation("=== INITIALIZING SERVICE PROVIDER ===");
+                Log.Information("=== INITIALIZING SERVICE PROVIDER ===");
 
                 var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
                 var isDevelopment = environmentName.Equals("Development", StringComparison.OrdinalIgnoreCase);
-                logger.LogInformation("Environment: {EnvironmentName}", environmentName);
+                Log.Information("Environment: {EnvironmentName}", environmentName);
 
                 var awsRegion = Environment.GetEnvironmentVariable("AWS_REGION") ?? "sa-east-1";
                 var awsOptions = new AWSOptions { Region = RegionEndpoint.GetBySystemName(awsRegion) };
@@ -49,7 +50,7 @@ namespace Fiap.Events.Functions
                     var appsettingsPath = Path.Combine(path, "appsettings.json");
                     if (File.Exists(appsettingsPath))
                     {
-                        logger.LogInformation("Found appsettings.json at: {AppsettingsPath}", appsettingsPath);
+                        Log.Information("Found appsettings.json at: {AppsettingsPath}", appsettingsPath);
                         basePath = path;
                         break;
                     }
@@ -80,11 +81,17 @@ namespace Fiap.Events.Functions
                 var configuration = builder.Build();
 
                 var services = new ServiceCollection();
+
                 services.AddSingleton<IConfiguration>(configuration);
                 services.AddDefaultAWSOptions(awsOptions);
 
+                services.AddProxyObservability(configuration, environmentName);
+
+                services.AddLambdaMetrics();
+
                 services.AddLogging(cfg => {
-                    cfg.AddConsole();
+                    cfg.ClearProviders();
+                    cfg.AddSerilog();
                     cfg.SetMinimumLevel(LogLevel.Information);
                 });
 
@@ -96,7 +103,11 @@ namespace Fiap.Events.Functions
 
                 ServiceProvider = services.BuildServiceProvider();
 
-                logger.LogInformation("=== SERVICE PROVIDER INITIALIZED SUCCESSFULLY ===");
+                var metrics = ServiceProvider.GetRequiredService<LambdaMetrics>();
+                metrics.UseHttpMetrics();
+                metrics.MapMetrics();
+
+                Log.Information("=== SERVICE PROVIDER INITIALIZED SUCCESSFULLY ===");
             }
             catch (Exception ex)
             {
@@ -104,6 +115,7 @@ namespace Fiap.Events.Functions
                     logger.LogCritical(ex, "FATAL ERROR in Program static constructor: {ErrorMessage}", ex.Message);
                 else
                 {
+                    Log.Fatal(ex, "FATAL ERROR in Program static constructor: {ErrorMessage}", ex.Message);
                     Console.WriteLine($"FATAL ERROR in Program static constructor: {ex.Message}");
                     Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 }
