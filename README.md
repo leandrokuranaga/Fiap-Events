@@ -129,3 +129,7 @@ Após executar a function com sucesso, você receberá um email de boas-vindas.
 
 ### Email na Caixa de Entrada
 ![Email de boas-vindas recebido](docs/assets/email.png)
+
+## Trigger
+
+![aws trigger](docs/assets/trigger.png)
