@@ -11,6 +11,8 @@
     <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Explicitly add AWSSDK.Core to resolve version conflicts -->
+    <PackageReference Include="AWSSDK.Core" Version="4.0.0" />
     <PackageReference Include="Amazon.Extensions.Configuration.SystemsManager" Version="7.0.0" />
     <PackageReference Include="Amazon.Lambda.Core" Version="2.7.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.4" />
