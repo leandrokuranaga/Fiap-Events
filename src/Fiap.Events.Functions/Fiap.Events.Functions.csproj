@@ -15,6 +15,8 @@
     <PackageReference Include="Amazon.Lambda.Core" Version="2.7.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.4" />
     <PackageReference Include="Amazon.Lambda.SQSEvents" Version="2.2.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.ApplicationStatus" Version="9.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Aws.Sqs" Version="9.0.0" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />

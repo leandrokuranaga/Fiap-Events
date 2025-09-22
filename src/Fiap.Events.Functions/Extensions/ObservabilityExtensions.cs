@@ -27,7 +27,7 @@ public static class ObservabilityExtensions
             .Enrich.WithEnvironmentName()
             .Enrich.WithMachineName()
             .Enrich.WithProcessId()
-            .Enrich.WithProperty("Application", "Fiap.Events.Lambda")
+            .Enrich.WithProperty("Application", "Lambda")
             .WriteTo.Console();
 
         if (!string.IsNullOrEmpty(lokiUri))
