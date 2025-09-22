@@ -6,7 +6,6 @@ public static class MetricsExtensions
 {
     public static IServiceCollection AddLambdaMetrics(this IServiceCollection services)
     {
-        // Configurar métricas como singletons
         services.AddSingleton(LambdaMetrics.Instance);
         
         return services;

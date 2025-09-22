@@ -82,6 +82,11 @@ namespace Fiap.Events.Functions
 
                 var services = new ServiceCollection();
 
+                services.AddHealthChecks()
+                    .AddSqs(o =>
+                        o.AddQueue(configuration.GetSection("ServiceBus:LambdaQueueName").ToString())
+                    );
+
                 services.AddSingleton<IConfiguration>(configuration);
                 services.AddDefaultAWSOptions(awsOptions);
 
