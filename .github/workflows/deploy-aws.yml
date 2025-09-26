@@ -36,8 +36,7 @@ jobs:
 
       - name: Deploy para AWS Lambda
         run: |
-          dotnet lambda deploy-function Fiap-Events --function-role "arn:aws:iam::433980487130:role/AWSLambdaSQSQueueExecutionFunction" \
-            --function-runtime dotnet8
+          dotnet lambda deploy-function Fiap-Events --function-role "arn:aws:iam::433980487130:role/AWSLambdaSQSQueueExecutionFunction" --function-runtime dotnet8
 
         working-directory: ./src/Fiap.Events.Services/Fiap.Events.Services
         env:
