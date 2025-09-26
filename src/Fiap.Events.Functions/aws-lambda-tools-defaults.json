@@ -13,5 +13,6 @@
   "function-memory-size": 512,
   "function-timeout": 30,
   "function-name": "Fiap-Event",
-  "function-handler": "Fiap.Events.Functions::Fiap.Events.Functions.Function::CreateUserFunction"
+  "function-handler": "Fiap.Events.Functions::Fiap.Events.Functions.Function::CreateUserFunction",
+  "msbuild-parameters": "--self-contained false"
 }
