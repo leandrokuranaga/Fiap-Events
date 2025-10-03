@@ -100,21 +100,21 @@ jobs:
       - name: Extract Version to Phase Stage
         id: phase
         env:
-          PHASE_OFFSET: 2 
+          PHASE_OFFSET: 2
         run: |
           VERSION="${{ steps.validate.outputs.version }}"
           MAJOR=$(echo "$VERSION" | cut -d. -f1 | sed 's/v//')
           PHASE=$((MAJOR + ${PHASE_OFFSET:-0}))
-          echo "phase=$PHASE" >> $GITHUB_OUTPUT  
+          echo "phase=$PHASE" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies
-        run: dotnet restore src/Fiap.Events/Fiap.Events.Functions.csproj
+        run: dotnet restore Fiap.Events.sln
 
       - name: Build application
-        run: dotnet build src/Fiap.Events/Fiap.Events.Functions.csproj --configuration Release --no-restore
+        run: dotnet build Fiap.Events.sln --configuration Release --no-restore
 
       - name: Publish application
-        run: dotnet publish src/Fiap.Events/Fiap.Events.Functions.csproj --configuration Release --output publish --no-restore
+        run: dotnet publish Fiap.Events.sln --configuration Release --output publish --no-restore
 
       - name: Create Build ZIP
         run: zip -r Fiap.Events.Functions-${{ steps.validate.outputs.version }}.zip publish/
