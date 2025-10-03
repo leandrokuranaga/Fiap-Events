@@ -28,15 +28,15 @@ O projeto segue uma arquitetura em camadas:
 ## Build & Tests
 | CI | Status |
 | --- | --- |
-| Validação PR| [![Pré-validação de Release/Hotfix](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/validate-release-pr.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/validate-release-pr.yml)
-| Validação PR Main e Dev | [![Validate PRs for Main and Dev](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/validate-pr.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/validate-pr.yml)
-| Release | [![Release on Main (.NET 8)](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/release.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/release.yml)
+| Validação PR| [![Pré-validação de Release/Hotfix](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/validate-release-pr.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/validate-release-pr.yml)
+| Validação PR Main e Dev | [![Validate PRs for Main and Dev](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/validate-pr.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/validate-pr.yml)
+| Release | [![Release on Main (.NET 8)](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/release.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/release.yml)
 
 
 ## Deployment
 | CD | Status |
 | --- | --- | 
-| AWS | [![Deploy to AWS ECS](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/deploy-aws.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap.Events/actions/workflows/deploy-aws.yml) | 
+| AWS | [![Deploy to AWS ECS](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/deploy-aws.yml/badge.svg)](https://github.com/leandrokuranaga/Fiap-Events/actions/workflows/deploy-aws.yml) | 
 
 
 ## Como Executar o Sistema
