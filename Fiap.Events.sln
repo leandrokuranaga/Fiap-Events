@@ -1,13 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11012.119 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Events.Functions", "src\Fiap.Events.Functions\Fiap.Events.Functions.csproj", "{60135B20-5441-D245-3C5A-2B053D932407}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Function Layer", "1. Function Layer", "{3BACFE95-226F-000B-A7E8-19C773261D14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Events.Functions.Tests", "test\Fiap.Events.Tests\Fiap.Events.Functions.Tests.csproj", "{A3318D17-A190-71EF-DC58-29B71A5E2144}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Events.Functions", "src\Fiap.Events.Functions\Fiap.Events.Functions.csproj", "{58CEC0E2-2C2C-0BE2-8D38-31EBA3B14B19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Events.Services", "src\Fiap.Events.Services\Fiap.Events.Services.csproj", "{309E3E41-FCD5-4AA9-8623-AB150A99AB8D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Application Layer", "2. Application Layer", "{3E56B33C-45A5-0CEC-E390-259048707042}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Events.Services", "src\Fiap.Events.Services\Fiap.Events.Services\Fiap.Events.Services.csproj", "{00DB21BF-DBF1-6801-3B44-FD2366682D82}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Infra Layer", "3. Infra Layer", "{26AE746F-AA3B-3703-05A5-155D9CDBB842}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Contracts.Events", "src\Fiap.Contracts.Events\Fiap.Contracts.Events.csproj", "{C279596F-5ABE-4728-99A7-F7B8EB2EC97D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Events.Infra", "src\Fiap.Events.Infra\Fiap.Events.Infra.csproj", "{2F93834D-4AD6-C3FF-954E-8D0AA45632C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Tests Layer", "4. Tests Layer", "{2C6A23BB-BCC8-126D-714C-EAC1B15A0C6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiap.Events.Unit.Tests", "test\Fiap.Events.Tests\Fiap.Events.Unit.Tests.csproj", "{06DE6753-E62E-9C06-F2C9-9B2970C7F1C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,23 +27,35 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{60135B20-5441-D245-3C5A-2B053D932407}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{60135B20-5441-D245-3C5A-2B053D932407}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{60135B20-5441-D245-3C5A-2B053D932407}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{60135B20-5441-D245-3C5A-2B053D932407}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3318D17-A190-71EF-DC58-29B71A5E2144}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3318D17-A190-71EF-DC58-29B71A5E2144}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3318D17-A190-71EF-DC58-29B71A5E2144}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3318D17-A190-71EF-DC58-29B71A5E2144}.Release|Any CPU.Build.0 = Release|Any CPU
-		{309E3E41-FCD5-4AA9-8623-AB150A99AB8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{309E3E41-FCD5-4AA9-8623-AB150A99AB8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{309E3E41-FCD5-4AA9-8623-AB150A99AB8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{309E3E41-FCD5-4AA9-8623-AB150A99AB8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58CEC0E2-2C2C-0BE2-8D38-31EBA3B14B19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58CEC0E2-2C2C-0BE2-8D38-31EBA3B14B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58CEC0E2-2C2C-0BE2-8D38-31EBA3B14B19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58CEC0E2-2C2C-0BE2-8D38-31EBA3B14B19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00DB21BF-DBF1-6801-3B44-FD2366682D82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00DB21BF-DBF1-6801-3B44-FD2366682D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00DB21BF-DBF1-6801-3B44-FD2366682D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00DB21BF-DBF1-6801-3B44-FD2366682D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C279596F-5ABE-4728-99A7-F7B8EB2EC97D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C279596F-5ABE-4728-99A7-F7B8EB2EC97D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C279596F-5ABE-4728-99A7-F7B8EB2EC97D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C279596F-5ABE-4728-99A7-F7B8EB2EC97D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F93834D-4AD6-C3FF-954E-8D0AA45632C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F93834D-4AD6-C3FF-954E-8D0AA45632C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F93834D-4AD6-C3FF-954E-8D0AA45632C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F93834D-4AD6-C3FF-954E-8D0AA45632C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06DE6753-E62E-9C06-F2C9-9B2970C7F1C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06DE6753-E62E-9C06-F2C9-9B2970C7F1C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06DE6753-E62E-9C06-F2C9-9B2970C7F1C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06DE6753-E62E-9C06-F2C9-9B2970C7F1C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6EF08B69-9195-4DB7-95CA-13BCE88B4E99}
+	GlobalSection(NestedProjects) = preSolution
+		{58CEC0E2-2C2C-0BE2-8D38-31EBA3B14B19} = {3BACFE95-226F-000B-A7E8-19C773261D14}
+		{00DB21BF-DBF1-6801-3B44-FD2366682D82} = {3E56B33C-45A5-0CEC-E390-259048707042}
+		{C279596F-5ABE-4728-99A7-F7B8EB2EC97D} = {26AE746F-AA3B-3703-05A5-155D9CDBB842}
+		{2F93834D-4AD6-C3FF-954E-8D0AA45632C4} = {26AE746F-AA3B-3703-05A5-155D9CDBB842}
+		{06DE6753-E62E-9C06-F2C9-9B2970C7F1C6} = {2C6A23BB-BCC8-126D-714C-EAC1B15A0C6B}
 	EndGlobalSection
 EndGlobal
