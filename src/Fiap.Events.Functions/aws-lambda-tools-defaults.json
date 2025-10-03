@@ -5,12 +5,14 @@
     "dotnet lambda help",
     "All the command line options for the Lambda command can be specified in this file."
   ],
-  "profile": "",
-  "region": "",
+  "profile": "default",
+  "region": "sa-east-1",
   "configuration": "Release",
   "function-architecture": "x86_64",
   "function-runtime": "dotnet8",
   "function-memory-size": 512,
   "function-timeout": 30,
-  "function-handler": "Fiap.Events::Fiap.Events.Function::FunctionHandler"
+  "function-name": "Fiap-Event",
+  "function-handler": "Fiap.Events.Functions::Fiap.Events.Functions.Function::CreateUserFunction",
+  "msbuild-parameters": "--self-contained false"
 }

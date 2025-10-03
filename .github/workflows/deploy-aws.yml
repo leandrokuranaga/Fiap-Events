@@ -1,0 +1,44 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais da AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Instalar Amazon Lambda Tools
+        run: dotnet tool install -g Amazon.Lambda.Tools
+
+      - name: Restaurar dependências
+        run: dotnet restore
+
+      - name: Build da aplicação
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Deploy para AWS Lambda
+        run: |
+          dotnet lambda deploy-function Fiap-Events --function-role "arn:aws:iam::433980487130:role/AWSLambdaSQSQueueExecutionFunction" --function-runtime dotnet8
+
+        working-directory: ./src/Fiap.Events.Services/Fiap.Events.Services
+        env:
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      
